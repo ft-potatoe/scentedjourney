@@ -236,10 +236,6 @@ async function loadPerfumes(){
   }
 }
 
-async function savePerfumes(p){
-  // No-op: individual operations (stock update, toggle, add, edit, delete)
-  // write directly to Supabase themselves.
-}
 
 async function dbUpdateStock(id, stock){
   await sbFetch(`products?id=eq.${id}`, {
@@ -496,7 +492,7 @@ function renderAdminPanel(){
       </div>
     </div>
     <div class="admin-content">
-      <div class="admin-info">${SHEETS_GUIDE}</div>
+      <div class="admin-info"><strong>Live database connected.</strong> All changes save instantly to Supabase. Product images, stock levels, and visibility are shared across all devices in real time.</div>
       <div class="admin-top">
         <h2>Stock Management</h2>
         <div style="display:flex;gap:0.8rem">
