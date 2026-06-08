@@ -183,32 +183,100 @@ footer{background:var(--ink);color:rgba(250,247,242,0.5);padding:3rem 4rem;displ
 <div id="app"></div>
 
 <script>
-const ADMIN_PASSWORD = 'scentedjourney2024';
+const ADMIN_PASSWORD_HASH = '9cd6c3a98306a7f27764454f457690e7bc13d2e13b555a551c79c9399bc6275a';
+const SB_URL = 'https://mkrglzevjhrnfxnuujmk.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rcmdsemV2amhybmZ4bnV1am1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MjMyMTUsImV4cCI6MjA5NjQ5OTIxNX0.VlD-7XQLvfAR5kffQLDYeRvOGDLv0Vsi9Bc-z7GrTBY';
 
-const SHEETS_GUIDE = `
-<strong>How to connect Google Sheets (one-time setup):</strong><br><br>
-1. Create a Google Sheet with these columns:<br>
-&nbsp;&nbsp;<code>id | name | concentration | notes | size | price | stock | active</code><br><br>
-2. Go to <strong>Extensions → Apps Script</strong>, paste the Web App script (provided separately), deploy as web app with "Anyone" access.<br><br>
-3. Paste your Web App URL in Admin → Settings. Stock updates from this panel will instantly write to your Sheet — no coding needed!<br><br>
-<em>Until connected, stock is managed directly in this admin panel and saved in your browser.</em>
-`;
+const sbHeaders = {
+  'apikey': SB_ANON,
+  'Authorization': `Bearer ${SB_ANON}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+async function sbFetch(path, options={}){
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: sbHeaders,
+    ...options
+  });
+  if(!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+async function hashPassword(pw){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+  return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
 
 const defaultPerfumes = [
-  {id:1,name:'Oud & Amber',concentration:'Eau de Parfum',notes:'Dark oud, warm amber, sandalwood, vanilla',description:'',image:'',size:'50ml / 100ml',price:'£85 / £145',stock:12,active:true},
-  {id:2,name:'Rose Saffron',concentration:'Parfum',notes:'Bulgarian rose, precious saffron, musk, vetiver',description:'',image:'',size:'30ml / 50ml',price:'£110 / £175',stock:5,active:true},
-  {id:3,name:'White Cedar',concentration:'Eau de Toilette',notes:'Fresh cedar, bergamot, white tea, light musk',description:'',image:'',size:'50ml / 100ml',price:'£65 / £110',stock:20,active:true},
-  {id:4,name:'Velvet Iris',concentration:'Eau de Parfum',notes:'Iris root, violet, soft leather, cashmere wood',description:'',image:'',size:'50ml / 100ml',price:'£95 / £160',stock:3,active:true},
-  {id:5,name:'Midnight Oud',concentration:'Parfum',notes:'Royal oud, black pepper, incense, dark resins',description:'',image:'',size:'30ml / 50ml',price:'£130 / £210',stock:0,active:true},
-  {id:6,name:'Citrus Garden',concentration:'Eau de Toilette',notes:'Sicilian lemon, neroli, green tea, light cedar',description:'',image:'',size:'50ml / 100ml',price:'£55 / £90',stock:18,active:true},
+  {name:'Oud & Amber',concentration:'Eau de Parfum',notes:'Dark oud, warm amber, sandalwood, vanilla',description:'',image:'',size:'50ml / 100ml',price:'£85 / £145',stock:12,active:true},
+  {name:'Rose Saffron',concentration:'Parfum',notes:'Bulgarian rose, precious saffron, musk, vetiver',description:'',image:'',size:'30ml / 50ml',price:'£110 / £175',stock:5,active:true},
+  {name:'White Cedar',concentration:'Eau de Toilette',notes:'Fresh cedar, bergamot, white tea, light musk',description:'',image:'',size:'50ml / 100ml',price:'£65 / £110',stock:20,active:true},
+  {name:'Velvet Iris',concentration:'Eau de Parfum',notes:'Iris root, violet, soft leather, cashmere wood',description:'',image:'',size:'50ml / 100ml',price:'£95 / £160',stock:3,active:true},
+  {name:'Midnight Oud',concentration:'Parfum',notes:'Royal oud, black pepper, incense, dark resins',description:'',image:'',size:'30ml / 50ml',price:'£130 / £210',stock:0,active:true},
+  {name:'Citrus Garden',concentration:'Eau de Toilette',notes:'Sicilian lemon, neroli, green tea, light cedar',description:'',image:'',size:'50ml / 100ml',price:'£55 / £90',stock:18,active:true},
 ];
 
-function loadPerfumes(){
-  try{const s=localStorage.getItem('sj_perfumes');return s?JSON.parse(s):defaultPerfumes}catch{return defaultPerfumes}
+async function loadPerfumes(){
+  try{
+    const rows = await sbFetch('products?select=*&order=id.asc');
+    if(rows.length === 0){
+      // First run — seed the table with defaults
+      const seeded = await sbFetch('products', {
+        method:'POST',
+        body: JSON.stringify(defaultPerfumes)
+      });
+      return seeded;
+    }
+    return rows;
+  } catch(e){
+    console.error('Supabase load failed:', e);
+    return defaultPerfumes;
+  }
 }
-function savePerfumes(p){try{localStorage.setItem('sj_perfumes',JSON.stringify(p))}catch{}}
 
-let perfumes=loadPerfumes();
+async function savePerfumes(p){
+  // No-op: individual operations (stock update, toggle, add, edit, delete)
+  // write directly to Supabase themselves.
+}
+
+async function dbUpdateStock(id, stock){
+  await sbFetch(`products?id=eq.${id}`, {
+    method:'PATCH',
+    body: JSON.stringify({stock})
+  });
+}
+
+async function dbToggleActive(id, active){
+  await sbFetch(`products?id=eq.${id}`, {
+    method:'PATCH',
+    body: JSON.stringify({active})
+  });
+}
+
+async function dbInsertProduct(product){
+  const rows = await sbFetch('products', {
+    method:'POST',
+    body: JSON.stringify(product)
+  });
+  return rows[0];
+}
+
+async function dbUpdateProduct(id, product){
+  const rows = await sbFetch(`products?id=eq.${id}`, {
+    method:'PATCH',
+    body: JSON.stringify(product)
+  });
+  return rows[0];
+}
+
+async function dbDeleteProduct(id){
+  await sbFetch(`products?id=eq.${id}`, {method:'DELETE'});
+}
+
+let perfumes=[];
+let dbLoading=true;
 let currentView='home';
 let adminLoggedIn=false;
 let reserveTarget=null;
@@ -273,6 +341,9 @@ function renderHero(){
 }
 
 function renderCollection(){
+  if(dbLoading) return `<section id="collection" style="background:var(--cream);text-align:center;padding:6rem 2rem">
+    <p style="font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)">Loading collection…</p>
+  </section>`;
   const active=perfumes.filter(p=>p.active);
   return `<section id="collection" style="background:var(--cream)">
     <div class="section-header">
@@ -391,7 +462,7 @@ function renderReserveForm(){
 function renderFooter(){
   return `<footer>
     <div class="footer-brand">Scented <span>Journey</span></div>
-    <p class="footer-text">© 2024 Scented Journey Ltd · London, UK</p>
+    <p class="footer-text">© ${new Date().getFullYear()} Scented Journey Ltd · London, UK</p>
     <div class="footer-links">
       <a onclick="scrollToCollection()">Collection</a>
       <a onclick="scrollToReserve()">Reserve</a>
@@ -421,7 +492,6 @@ function renderAdminPanel(){
     <div class="admin-header">
       <h1>Scented <span>Journey</span> — Admin</h1>
       <div style="display:flex;gap:1rem;align-items:center">
-        <span class="sheets-badge">● Google Sheets</span>
         <button class="btn-sm btn-outline" style="color:var(--cream);border-color:rgba(250,247,242,0.3)" onclick="adminLoggedIn=false;render()">Sign Out</button>
       </div>
     </div>
@@ -563,6 +633,14 @@ function render(){
   }
   app.innerHTML=renderNav()+renderHero()+renderCollection()+renderStory()+renderReserveForm()+renderFooter()+renderAdminLogin()+renderToast();
   formspree('initForm',{formElement:'#reserve-form',formId:'maqzopvj'});
+  const form=document.getElementById('reserve-form');
+  if(form){
+    form.addEventListener('submit',function(e){
+      const selected=form.querySelector('[name="fragrance"]')?.value;
+      const valid=perfumes.some(p=>p.active&&p.stock>0&&p.name===selected);
+      if(!valid){e.preventDefault();e.stopImmediatePropagation();showToast('That fragrance is no longer available.');}
+    },true);
+  }
 }
 
 function navigate(v){currentView=v;render();window.scrollTo({top:0,behavior:'smooth'})}
@@ -577,9 +655,10 @@ function openReserve(id){
 }
 
 
-function attemptLogin(){
+async function attemptLogin(){
   const pw=document.getElementById('admin-pw')?.value;
-  if(pw===ADMIN_PASSWORD){adminLoggedIn=true;showAdminLogin=false;render();}
+  const hash=await hashPassword(pw);
+  if(hash===ADMIN_PASSWORD_HASH){adminLoggedIn=true;showAdminLogin=false;render();}
   else{const e=document.getElementById('admin-error');if(e)e.style.display='block';}
 }
 
@@ -590,22 +669,34 @@ function updateStock(id,val){
   const row=document.querySelector(`input[onchange*="updateStock(${id}"]`) || document.querySelector(`input[oninput*="updateStock(${id}"]`);
 }
 
-function toggleActive(id,val){
+async function toggleActive(id,val){
   perfumes=perfumes.map(p=>p.id===id?{...p,active:val}:p);
-  showSaveBar=true;
-  savePerfumes(perfumes);
   render();
+  try{
+    await dbToggleActive(id,val);
+    showToast(val?'Product set to visible.':'Product hidden.');
+  }catch(e){
+    showToast('Failed to save. Please try again.');
+    perfumes=perfumes.map(p=>p.id===id?{...p,active:!val}:p);
+    render();
+  }
 }
 
-function saveChanges(){
-  Object.entries(adminEdits).forEach(([id,stock])=>{
-    perfumes=perfumes.map(p=>p.id===parseInt(id)?{...p,stock}:p);
-  });
-  adminEdits={};
-  showSaveBar=false;
-  savePerfumes(perfumes);
-  render();
-  showToast('Changes saved successfully.');
+async function saveChanges(){
+  try{
+    await Promise.all(
+      Object.entries(adminEdits).map(([id,stock])=>dbUpdateStock(parseInt(id),stock))
+    );
+    Object.entries(adminEdits).forEach(([id,stock])=>{
+      perfumes=perfumes.map(p=>p.id===parseInt(id)?{...p,stock}:p);
+    });
+    adminEdits={};
+    showSaveBar=false;
+    render();
+    showToast('Stock saved successfully.');
+  }catch(e){
+    showToast('Failed to save stock. Please try again.');
+  }
 }
 
 function discardChanges(){adminEdits={};showSaveBar=false;render();}
@@ -633,7 +724,7 @@ function removeModalImage(){
   render();
 }
 
-function saveModal(isNew,id){
+async function saveModal(isNew,id){
   const name=document.getElementById('m-name')?.value.trim();
   const conc=document.getElementById('m-conc')?.value;
   const stock=parseInt(document.getElementById('m-stock')?.value)||0;
@@ -644,25 +735,34 @@ function saveModal(isNew,id){
   const active=document.getElementById('m-active')?.checked;
   const image=pendingImage!==null?pendingImage:(editPerfume?.image||'');
   if(!name){showToast('Name is required.');return;}
-  if(isNew){
-    const newId=Math.max(...perfumes.map(p=>p.id),0)+1;
-    perfumes=[...perfumes,{id:newId,name,concentration:conc,notes,description,image,size,price,stock,active}];
-  } else {
-    perfumes=perfumes.map(p=>p.id===id?{...p,name,concentration:conc,notes,description,image,size,price,stock,active}:p);
+  const payload={name,concentration:conc,notes,description,image,size,price,stock,active};
+  try{
+    if(isNew){
+      const row=await dbInsertProduct(payload);
+      perfumes=[...perfumes,row];
+    } else {
+      const row=await dbUpdateProduct(id,payload);
+      perfumes=perfumes.map(p=>p.id===id?{...p,...payload}:p);
+    }
+    showModal=false;editPerfume=null;pendingImage=null;
+    render();
+    showToast(isNew?'Fragrance added.':'Changes saved.');
+  }catch(e){
+    showToast('Failed to save. Please try again.');
   }
-  savePerfumes(perfumes);
-  showModal=false;editPerfume=null;pendingImage=null;
-  render();
-  showToast(isNew?'Fragrance added.':'Changes saved.');
 }
 
-function deletePerfume(id){
+async function deletePerfume(id){
   if(!confirm('Remove this fragrance from the collection?'))return;
-  perfumes=perfumes.filter(p=>p.id!==id);
-  savePerfumes(perfumes);
-  showModal=false;editPerfume=null;pendingImage=null;
-  render();
-  showToast('Fragrance removed.');
+  try{
+    await dbDeleteProduct(id);
+    perfumes=perfumes.filter(p=>p.id!==id);
+    showModal=false;editPerfume=null;pendingImage=null;
+    render();
+    showToast('Fragrance removed.');
+  }catch(e){
+    showToast('Failed to delete. Please try again.');
+  }
 }
 
 function exportCSV(){
@@ -685,8 +785,14 @@ function checkAdminHash(){
 }
 
 window.addEventListener('hashchange',checkAdminHash);
-checkAdminHash();
-render();
+
+(async()=>{
+  render(); // show loading state immediately
+  perfumes=await loadPerfumes();
+  dbLoading=false;
+  render();
+  checkAdminHash();
+})();
 </script>
 </body>
 </html>
