@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scented Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+<script>window.formspree=window.formspree||function(){(formspree.q=formspree.q||[]).push(arguments)};</script>
+<script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#faf7f2;--ink:#1a1410;--gold:#b8945a;--gold-light:#e8d5b0;--rose:#8c5a5a;--sage:#5a7a6a;
+  --card-bg:#ffffff;--border:#e8ddd0;--muted:#8a7a6a;--hero-h:92vh;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--ink);font-weight:300;letter-spacing:0.02em}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 4rem;background:rgba(250,247,242,0.92);backdrop-filter:blur(8px);border-bottom:0.5px solid var(--border)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink);cursor:pointer}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{text-decoration:none;font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);transition:color 0.2s}
+.nav-links a:hover{color:var(--ink)}
+.nav-reserve{background:var(--ink);color:var(--cream)!important;padding:0.5rem 1.4rem;font-size:0.75rem!important;letter-spacing:0.18em!important}
+.nav-reserve:hover{background:var(--gold)!important;color:var(--ink)!important}
+
+/* HERO */
+.hero{height:var(--hero-h);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:5rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,#f0e8d8 0%,var(--cream) 70%);z-index:0}
+.hero-ornament{position:absolute;font-size:28rem;font-family:'Cormorant Garamond',serif;color:rgba(184,148,90,0.06);top:-4rem;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;user-select:none}
+.hero-content{position:relative;z-index:1}
+.hero-eyebrow{font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:5.5rem;font-weight:300;line-height:1.05;letter-spacing:0.04em;margin-bottom:1rem}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:0.88rem;letter-spacing:0.12em;color:var(--muted);max-width:38ch;margin:0 auto 2.5rem}
+.hero-cta{display:inline-flex;gap:1rem}
+.btn-primary{background:var(--ink);color:var(--cream);padding:0.85rem 2.4rem;font-family:'Jost',sans-serif;font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.2s}
+.btn-primary:hover{background:var(--gold);color:var(--ink)}
+.btn-ghost{background:transparent;color:var(--ink);padding:0.85rem 2.4rem;font-family:'Jost',sans-serif;font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;border:0.5px solid var(--ink);cursor:pointer;transition:all 0.2s}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:0.5rem;cursor:pointer}
+.hero-scroll::after{content:'';width:0.5px;height:2.5rem;background:var(--gold);display:block}
+
+/* SECTION LAYOUT */
+section{padding:6rem 4rem}
+.section-header{text-align:center;margin-bottom:4rem}
+.section-eyebrow{font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;letter-spacing:0.04em}
+.divider{width:3rem;height:0.5px;background:var(--gold);margin:1.2rem auto 0}
+
+/* COLLECTION GRID */
+.collection-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5px;background:var(--border)}
+.perfume-card{background:var(--card-bg);padding:2.5rem 2rem;position:relative;transition:transform 0.3s}
+.perfume-card:hover{transform:translateY(-3px);z-index:1;box-shadow:0 12px 40px rgba(26,20,16,0.08)}
+.card-badge{position:absolute;top:1.5rem;right:1.5rem;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;padding:0.3rem 0.7rem}
+.badge-instock{background:#e8f0eb;color:#3a6b47}
+.badge-low{background:#f5ecd8;color:#8a5a20}
+.badge-out{background:#f5e8e8;color:#8a3a3a}
+.card-number{font-family:'Cormorant Garamond',serif;font-size:0.75rem;color:var(--gold);letter-spacing:0.2em;margin-bottom:1.2rem}
+.card-fragrance-icon{width:4.5rem;height:6rem;margin:0 0 1.5rem;opacity:0.7}
+.card-img-wrap{width:100%;height:200px;overflow:hidden;margin-bottom:1.5rem;background:var(--cream);display:flex;align-items:center;justify-content:center}
+.card-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.card-img-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;letter-spacing:0.04em;margin-bottom:0.3rem}
+.card-concentration{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.8rem}
+.card-description{font-size:0.82rem;color:var(--ink);line-height:1.7;margin-bottom:0.8rem}
+.card-notes{font-size:0.78rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem}
+.card-size-price{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.size-pill{font-size:0.72rem;letter-spacing:0.1em;padding:0.3rem 0.8rem;border:0.5px solid var(--border);color:var(--muted)}
+.card-price{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--ink);margin-bottom:1.2rem}
+.card-cta{width:100%;background:transparent;border:0.5px solid var(--ink);padding:0.7rem;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;color:var(--ink)}
+.card-cta:hover:not(:disabled){background:var(--ink);color:var(--cream)}
+.card-cta:disabled{opacity:0.35;cursor:not-allowed;border-color:var(--border)}
+
+/* IMAGE UPLOAD */
+.img-upload-area{border:1.5px dashed var(--border);padding:1.2rem;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--cream);position:relative}
+.img-upload-area:hover{border-color:var(--gold)}
+.img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-upload-preview{width:100%;max-height:160px;object-fit:cover;display:block;margin-top:0.8rem;border:0.5px solid var(--border)}
+.img-upload-text{font-size:0.75rem;letter-spacing:0.1em;color:var(--muted)}
+.img-remove-btn{margin-top:0.5rem;background:none;border:0.5px solid var(--border);padding:0.25rem 0.7rem;font-size:0.7rem;letter-spacing:0.1em;cursor:pointer;color:var(--muted);font-family:'Jost',sans-serif}
+.img-remove-btn:hover{border-color:#8a3a3a;color:#8a3a3a}
+
+/* STORY */
+.story-section{background:var(--ink);color:var(--cream)}
+.story-inner{max-width:700px;margin:0 auto;text-align:center}
+.story-inner .section-eyebrow{color:var(--gold-light)}
+.story-inner .section-title{color:var(--cream);font-size:2.8rem;margin-bottom:1.5rem}
+.story-inner .divider{background:var(--gold-light)}
+.story-body{font-size:1.05rem;line-height:1.9;color:rgba(250,247,242,0.75);margin-top:2rem;font-family:'Cormorant Garamond',serif;font-style:italic}
+
+/* RESERVE FORM */
+.reserve-section{background:#f5f1ea}
+.reserve-inner{max-width:680px;margin:0 auto}
+.reserve-inner .section-header{margin-bottom:3rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.form-full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:0.5rem}
+.form-label{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.form-input,.form-select,.form-textarea{background:var(--cream);border:0.5px solid var(--border);padding:0.85rem 1rem;font-family:'Jost',sans-serif;font-size:0.88rem;color:var(--ink);font-weight:300;outline:none;transition:border-color 0.2s;width:100%;appearance:none;-webkit-appearance:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold)}
+.form-textarea{resize:vertical;min-height:100px}
+.form-submit{margin-top:2rem;width:100%;background:var(--ink);color:var(--cream);padding:1.1rem;font-family:'Jost',sans-serif;font-size:0.78rem;letter-spacing:0.25em;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.2s}
+.form-submit:hover{background:var(--gold);color:var(--ink)}
+.form-note{text-align:center;margin-top:1rem;font-size:0.75rem;color:var(--muted);letter-spacing:0.05em}
+.form-field-error{font-size:0.72rem;color:#8a3a3a;margin-top:0.3rem;letter-spacing:0.03em}
+.form-input[aria-invalid=true],.form-select[aria-invalid=true],.form-textarea[aria-invalid=true]{border-color:#8a3a3a}
+.form-global-error{background:#f5e8e8;border:0.5px solid #8a3a3a;color:#8a3a3a;padding:0.8rem 1rem;font-size:0.78rem;margin-bottom:1rem;display:none}
+.form-global-error.visible{display:block}
+.form-success{text-align:center;padding:3rem 2rem;background:var(--cream);border:0.5px solid var(--border)}
+.form-success h3{font-family:'Cormorant Garamond',serif;font-size:2rem;margin-bottom:0.8rem}
+.form-success p{font-size:0.85rem;color:var(--muted);line-height:1.7}
+
+/* FOOTER */
+footer{background:var(--ink);color:rgba(250,247,242,0.5);padding:3rem 4rem;display:flex;align-items:center;justify-content:space-between}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--cream)}
+.footer-brand span{color:var(--gold)}
+.footer-text{font-size:0.72rem;letter-spacing:0.1em}
+.footer-links{display:flex;gap:2rem}
+.footer-links a{color:rgba(250,247,242,0.4);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:color 0.2s}
+.footer-links a:hover{color:var(--gold)}
+
+/* ADMIN */
+.admin-overlay{position:fixed;inset:0;background:rgba(26,20,16,0.92);z-index:999;display:flex;align-items:center;justify-content:center}
+.admin-login{background:var(--cream);padding:3rem;width:min(420px,90vw)}
+.admin-login h2{font-family:'Cormorant Garamond',serif;font-size:2rem;margin-bottom:0.4rem}
+.admin-login p{font-size:0.8rem;color:var(--muted);margin-bottom:2rem;letter-spacing:0.05em}
+.admin-panel{min-height:100vh;background:#f7f4ef;padding-top:5rem}
+.admin-header{position:fixed;top:0;left:0;right:0;background:var(--ink);color:var(--cream);padding:1rem 3rem;display:flex;align-items:center;justify-content:space-between;z-index:100}
+.admin-header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;letter-spacing:0.1em}
+.admin-header h1 span{color:var(--gold)}
+.admin-content{max-width:1100px;margin:0 auto;padding:2rem 3rem}
+.admin-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:gap 1rem}
+.admin-top h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem}
+.btn-sm{padding:0.5rem 1.2rem;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:none}
+.btn-ink{background:var(--ink);color:var(--cream)}
+.btn-ink:hover{background:var(--gold);color:var(--ink)}
+.btn-outline{background:transparent;border:0.5px solid var(--ink);color:var(--ink)}
+.btn-outline:hover{background:var(--ink);color:var(--cream)}
+.btn-danger{background:#8a3a3a;color:white}
+.btn-danger:hover{background:#6a2a2a}
+.admin-info{background:var(--gold-light);border-left:3px solid var(--gold);padding:1rem 1.4rem;margin-bottom:2rem;font-size:0.82rem;line-height:1.6;color:var(--ink)}
+.admin-info strong{font-weight:500}
+.admin-table{width:100%;border-collapse:collapse;background:white;font-size:0.85rem}
+.admin-table th{background:var(--ink);color:var(--cream);padding:0.9rem 1rem;text-align:left;font-weight:400;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase}
+.admin-table td{padding:0.9rem 1rem;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.admin-table tr:hover td{background:#faf7f2}
+.stock-input{width:70px;padding:0.35rem 0.5rem;border:0.5px solid var(--border);font-family:'Jost',sans-serif;font-size:0.88rem;text-align:center;background:var(--cream);color:var(--ink)}
+.stock-input:focus{outline:none;border-color:var(--gold)}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+.dot-green{background:#3a6b47}.dot-amber{background:#8a5a20}.dot-red{background:#8a3a3a}
+.save-bar{position:fixed;bottom:0;left:0;right:0;background:var(--ink);padding:1rem 3rem;display:flex;align-items:center;justify-content:space-between;color:var(--cream);font-size:0.82rem;z-index:200}
+.save-bar.hidden{display:none}
+.sheets-badge{display:inline-flex;align-items:center;gap:0.5rem;background:#e8f5e9;color:#2e7d32;padding:0.3rem 0.8rem;font-size:0.7rem;letter-spacing:0.1em}
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:var(--cream);padding:1rem 1.5rem;font-size:0.82rem;letter-spacing:0.05em;z-index:999;opacity:0;transition:opacity 0.3s}
+.toast.show{opacity:1}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(26,20,16,0.7);z-index:500;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--cream);width:min(560px,92vw);max-height:90vh;overflow-y:auto;padding:2.5rem}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:0.3rem}
+.modal-sub{font-size:0.78rem;color:var(--muted);margin-bottom:2rem;letter-spacing:0.05em}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.modal-full{grid-column:1/-1}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  .hero-title{font-size:3rem}
+  section{padding:4rem 1.5rem}
+  .form-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:1.5rem;text-align:center;padding:2rem 1.5rem}
+  .admin-content{padding:1rem 1.5rem}
+  .modal-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const ADMIN_PASSWORD = 'scentedjourney2024';
+
+const SHEETS_GUIDE = `
+<strong>How to connect Google Sheets (one-time setup):</strong><br><br>
+1. Create a Google Sheet with these columns:<br>
+&nbsp;&nbsp;<code>id | name | concentration | notes | size | price | stock | active</code><br><br>
+2. Go to <strong>Extensions → Apps Script</strong>, paste the Web App script (provided separately), deploy as web app with "Anyone" access.<br><br>
+3. Paste your Web App URL in Admin → Settings. Stock updates from this panel will instantly write to your Sheet — no coding needed!<br><br>
+<em>Until connected, stock is managed directly in this admin panel and saved in your browser.</em>
+`;
+
+const defaultPerfumes = [
+  {id:1,name:'Oud & Amber',concentration:'Eau de Parfum',notes:'Dark oud, warm amber, sandalwood, vanilla',description:'',image:'',size:'50ml / 100ml',price:'£85 / £145',stock:12,active:true},
+  {id:2,name:'Rose Saffron',concentration:'Parfum',notes:'Bulgarian rose, precious saffron, musk, vetiver',description:'',image:'',size:'30ml / 50ml',price:'£110 / £175',stock:5,active:true},
+  {id:3,name:'White Cedar',concentration:'Eau de Toilette',notes:'Fresh cedar, bergamot, white tea, light musk',description:'',image:'',size:'50ml / 100ml',price:'£65 / £110',stock:20,active:true},
+  {id:4,name:'Velvet Iris',concentration:'Eau de Parfum',notes:'Iris root, violet, soft leather, cashmere wood',description:'',image:'',size:'50ml / 100ml',price:'£95 / £160',stock:3,active:true},
+  {id:5,name:'Midnight Oud',concentration:'Parfum',notes:'Royal oud, black pepper, incense, dark resins',description:'',image:'',size:'30ml / 50ml',price:'£130 / £210',stock:0,active:true},
+  {id:6,name:'Citrus Garden',concentration:'Eau de Toilette',notes:'Sicilian lemon, neroli, green tea, light cedar',description:'',image:'',size:'50ml / 100ml',price:'£55 / £90',stock:18,active:true},
+];
+
+function loadPerfumes(){
+  try{const s=localStorage.getItem('sj_perfumes');return s?JSON.parse(s):defaultPerfumes}catch{return defaultPerfumes}
+}
+function savePerfumes(p){try{localStorage.setItem('sj_perfumes',JSON.stringify(p))}catch{}}
+
+let perfumes=loadPerfumes();
+let currentView='home';
+let adminLoggedIn=false;
+let reserveTarget=null;
+let showAdminLogin=false;
+let adminEdits={};
+let showSaveBar=false;
+let toastMsg='';
+let showModal=false;
+let editPerfume=null;
+let pendingImage=null;
+
+function getStockStatus(n){
+  if(n===0)return{label:'Out of stock',cls:'badge-out',dot:'dot-red'};
+  if(n<=5)return{label:'Low stock',cls:'badge-low',dot:'dot-amber'};
+  return{label:'In stock',cls:'badge-instock',dot:'dot-green'};
+}
+
+function showToast(msg){
+  toastMsg=msg;render();
+  setTimeout(()=>{toastMsg='';render()},2800);
+}
+
+function BottleIcon({color}){
+  return `<svg width="56" height="88" viewBox="0 0 56 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="22" y="2" width="12" height="10" rx="2" fill="${color}" opacity="0.4"/>
+    <rect x="20" y="11" width="16" height="4" rx="1" fill="${color}" opacity="0.5"/>
+    <path d="M14 20 Q10 28 10 40 L10 72 Q10 80 18 82 L38 82 Q46 80 46 72 L46 40 Q46 28 42 20 Z" fill="${color}" opacity="0.15"/>
+    <path d="M14 20 Q10 28 10 40 L10 72 Q10 80 18 82 L38 82 Q46 80 46 72 L46 40 Q46 28 42 20 Z" stroke="${color}" stroke-width="1.5" fill="none" opacity="0.5"/>
+    <line x1="16" y1="50" x2="40" y2="50" stroke="${color}" stroke-width="0.5" opacity="0.4"/>
+  </svg>`;
+}
+
+const bottleColors=['#b8945a','#8c5a5a','#5a7a6a','#7a6a8c','#2a3a4a','#6a8a5a'];
+
+function renderNav(){
+  return `<nav>
+    <div class="nav-logo" onclick="navigate('home')">Scented <span>Journey</span></div>
+    <ul class="nav-links">
+      <li><a href="#" onclick="navigate('home');return false">Home</a></li>
+      <li><a href="#" onclick="scrollToCollection();return false">Collection</a></li>
+      <li><a href="#" onclick="scrollToStory();return false">Our Story</a></li>
+      <li><a href="#" onclick="scrollToReserve();return false" class="nav-reserve">Reserve</a></li>
+    </ul>
+  </nav>`;
+}
+
+function renderHero(){
+  return `<section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-ornament">◈</div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Artisan Perfumery · Est. London</p>
+      <h1 class="hero-title">Every Scent<br>Tells a <em>Story</em></h1>
+      <p class="hero-sub">A curated collection of rare and fine fragrances, crafted for those who seek the extraordinary.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="scrollToCollection()">Explore Collection</button>
+        <button class="btn-ghost" onclick="scrollToReserve()">Reserve a Fragrance</button>
+      </div>
+    </div>
+    <div class="hero-scroll" onclick="scrollToCollection()">Scroll<span></span></div>
+  </section>`;
+}
+
+function renderCollection(){
+  const active=perfumes.filter(p=>p.active);
+  return `<section id="collection" style="background:var(--cream)">
+    <div class="section-header">
+      <p class="section-eyebrow">The Collection</p>
+      <h2 class="section-title">Discover Our Fragrances</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="collection-grid">
+      ${active.map((p,i)=>{
+        const st=getStockStatus(p.stock);
+        const col=bottleColors[i%bottleColors.length];
+        const imgHtml=p.image
+          ?`<div class="card-img-wrap"><img src="${p.image}" alt="${p.name}" /></div>`
+          :`<div class="card-img-wrap"><div class="card-img-placeholder">${BottleIcon({color:col})}</div></div>`;
+        return `<div class="perfume-card">
+          <span class="card-badge ${st.cls}">${st.label}</span>
+          <div class="card-number">No. ${String(p.id).padStart(2,'0')}</div>
+          ${imgHtml}
+          <h3 class="card-name">${p.name}</h3>
+          <p class="card-concentration">${p.concentration}</p>
+          ${p.description?`<p class="card-description">${p.description}</p>`:''}
+          <p class="card-notes">${p.notes}</p>
+          <div class="card-size-price">
+            ${p.size.split(' / ').map(s=>`<span class="size-pill">${s}</span>`).join('')}
+          </div>
+          <p class="card-price">${p.price}</p>
+          <button class="card-cta" ${p.stock===0?'disabled':''} onclick="openReserve(${p.id})">
+            ${p.stock===0?'Currently Unavailable':'Reserve This Fragrance'}
+          </button>
+        </div>`;
+      }).join('')}
+    </div>
+  </section>`;
+}
+
+function renderStory(){
+  return `<section id="story" class="story-section">
+    <div class="story-inner">
+      <p class="section-eyebrow">Our Story</p>
+      <h2 class="section-title">A Journey Through Scent</h2>
+      <div class="divider"></div>
+      <p class="story-body">
+        Scented Journey was born from a passion for rare, evocative fragrances that transcend the ordinary. 
+        Each bottle in our collection is a chapter — a moment captured in oud, rose, cedarwood and smoke. 
+        We source from the finest perfumers across the world, bringing you a curated selection that spans 
+        from the warmth of the Middle East to the freshness of the Mediterranean. 
+        Based in the United Kingdom, we are dedicated to offering an intimate, personal experience.
+      </p>
+    </div>
+  </section>`;
+}
+
+function renderReserveForm(){
+  const availablePerfumes=perfumes.filter(p=>p.active&&p.stock>0);
+  const selectedName=reserveTarget?perfumes.find(p=>p.id===reserveTarget)?.name:'';
+  return `<section id="reserve" class="reserve-section">
+    <div class="reserve-inner">
+      <div class="section-header">
+        <p class="section-eyebrow">Reserve</p>
+        <h2 class="section-title">Secure Your Fragrance</h2>
+        <div class="divider"></div>
+        <p style="margin-top:1.2rem;font-size:0.83rem;color:var(--muted);line-height:1.7">
+          Submit your reservation request below. Our team will contact you within 24 hours to confirm availability and arrange payment.
+        </p>
+      </div>
+      <div data-fs-success style="display:none" class="form-success">
+        <h3>Thank You</h3>
+        <p>Your reservation request has been received.<br>A member of our team will be in touch within 24 hours.</p>
+      </div>
+      <div class="form-global-error" data-fs-error></div>
+      <form id="reserve-form" class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="f-name">Full Name *</label>
+          <input class="form-input" id="f-name" name="name" type="text" placeholder="Your name" required data-fs-field />
+          <span class="form-field-error" data-fs-error="name"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-phone">Phone Number *</label>
+          <input class="form-input" id="f-phone" name="phone" type="tel" placeholder="+44 7700 000000" required data-fs-field />
+          <span class="form-field-error" data-fs-error="phone"></span>
+        </div>
+        <div class="form-group form-full">
+          <label class="form-label" for="f-email">Email Address *</label>
+          <input class="form-input" id="f-email" name="email" type="email" placeholder="you@example.com" required data-fs-field />
+          <span class="form-field-error" data-fs-error="email"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-perfume">Fragrance *</label>
+          <select class="form-select" id="f-perfume" name="fragrance" required data-fs-field>
+            <option value="">— Select fragrance —</option>
+            ${availablePerfumes.map(p=>`<option value="${p.name}" ${selectedName===p.name?'selected':''}>${p.name}</option>`).join('')}
+          </select>
+          <span class="form-field-error" data-fs-error="fragrance"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-qty">Quantity</label>
+          <select class="form-select" id="f-qty" name="quantity">
+            <option value="1">1 bottle</option>
+            <option value="2">2 bottles</option>
+            <option value="3">3 bottles</option>
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label class="form-label" for="f-message">Message (optional)</label>
+          <textarea class="form-textarea" id="f-message" name="message" placeholder="Any preferences — size, gift wrapping, special requests…"></textarea>
+        </div>
+        <div class="form-full">
+          <button class="form-submit" type="submit" data-fs-submit-btn>Submit Reservation Request</button>
+          <p class="form-note">By submitting you agree to be contacted by our team. No payment is taken at this stage.</p>
+        </div>
+      </form>
+    </div>
+  </section>`;
+}
+
+function renderFooter(){
+  return `<footer>
+    <div class="footer-brand">Scented <span>Journey</span></div>
+    <p class="footer-text">© 2024 Scented Journey Ltd · London, UK</p>
+    <div class="footer-links">
+      <a onclick="scrollToCollection()">Collection</a>
+      <a onclick="scrollToReserve()">Reserve</a>
+      <a onclick="showAdminLogin=true;render()">Admin</a>
+    </div>
+  </footer>`;
+}
+
+function renderAdminLogin(){
+  if(!showAdminLogin)return'';
+  return `<div class="admin-overlay" onclick="if(event.target===this){showAdminLogin=false;render()}">
+    <div class="admin-login">
+      <h2>Admin Access</h2>
+      <p>Scented Journey stock management</p>
+      <div class="form-group" style="margin-bottom:1rem">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="admin-pw" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')attemptLogin()" />
+      </div>
+      <div id="admin-error" style="font-size:0.78rem;color:#8a3a3a;margin-bottom:1rem;display:none">Incorrect password. Try again.</div>
+      <button class="btn-primary" style="width:100%" onclick="attemptLogin()">Sign In</button>
+      <button class="btn-ghost" style="width:100%;margin-top:0.8rem" onclick="showAdminLogin=false;render()">Cancel</button>
+    </div>
+  </div>`;
+}
+
+function renderAdminPanel(){
+  return `<div class="admin-panel">
+    <div class="admin-header">
+      <h1>Scented <span>Journey</span> — Admin</h1>
+      <div style="display:flex;gap:1rem;align-items:center">
+        <span class="sheets-badge">● Google Sheets</span>
+        <button class="btn-sm btn-outline" style="color:var(--cream);border-color:rgba(250,247,242,0.3)" onclick="adminLoggedIn=false;render()">Sign Out</button>
+      </div>
+    </div>
+    <div class="admin-content">
+      <div class="admin-info">${SHEETS_GUIDE}</div>
+      <div class="admin-top">
+        <h2>Stock Management</h2>
+        <div style="display:flex;gap:0.8rem">
+          <button class="btn-sm btn-outline" onclick="exportCSV()">Export CSV</button>
+          <button class="btn-sm btn-ink" onclick="openAddModal()">+ Add Fragrance</button>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>No.</th><th>Image</th><th>Name</th><th>Type</th><th>Price</th><th>Stock</th><th>Status</th><th>Visible</th><th>Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${perfumes.map(p=>{
+            const st=getStockStatus(p.stock);
+            const editedStock=adminEdits[p.id]!==undefined?adminEdits[p.id]:p.stock;
+            return `<tr>
+              <td style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:1rem">${String(p.id).padStart(2,'0')}</td>
+              <td style="width:52px">${p.image?`<img src="${p.image}" style="width:44px;height:44px;object-fit:cover;display:block;border:0.5px solid var(--border)" />`:'<span style="font-size:0.7rem;color:var(--muted)">—</span>'}</td>
+              <td style="font-weight:400">${p.name}</td>
+              <td style="color:var(--muted);font-size:0.8rem">${p.concentration}</td>
+              <td style="font-family:'Cormorant Garamond',serif;font-size:1.05rem">${p.price.split('/')[0].trim()}</td>
+              <td>
+                <input class="stock-input" type="number" min="0" value="${editedStock}"
+                  onchange="updateStock(${p.id},this.value)" oninput="updateStock(${p.id},this.value)" />
+              </td>
+              <td><span class="status-dot ${st.dot}"></span>${st.label}</td>
+              <td>
+                <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.78rem">
+                  <input type="checkbox" ${p.active?'checked':''} onchange="toggleActive(${p.id},this.checked)" />
+                  ${p.active?'Shown':'Hidden'}
+                </label>
+              </td>
+              <td>
+                <button class="btn-sm btn-outline" style="font-size:0.65rem;padding:0.3rem 0.7rem" onclick="openEditModal(${p.id})">Edit</button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <p style="font-size:0.75rem;color:var(--muted);margin-top:1rem;text-align:right">
+        ${perfumes.length} fragrances · Last saved: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+      </p>
+    </div>
+    <div class="save-bar ${showSaveBar?'':'hidden'}">
+      <span>You have unsaved changes</span>
+      <div style="display:flex;gap:1rem">
+        <button class="btn-sm" style="background:transparent;border:0.5px solid rgba(250,247,242,0.3);color:var(--cream)" onclick="discardChanges()">Discard</button>
+        <button class="btn-sm" style="background:var(--gold);color:var(--ink)" onclick="saveChanges()">Save Changes</button>
+      </div>
+    </div>
+    ${renderEditModal()}
+  </div>`;
+}
+
+function renderEditModal(){
+  if(!showModal||!editPerfume)return'';
+  const p=editPerfume;
+  const isNew=!p.id;
+  const currentImg=pendingImage!==null?pendingImage:(p.image||'');
+  const imgPreview=currentImg
+    ?`<img class="img-upload-preview" src="${currentImg}" alt="Preview" /><button class="img-remove-btn" onclick="removeModalImage()">Remove image</button>`
+    :`<p class="img-upload-text">Click or drag to upload a product photo</p><p class="img-upload-text" style="font-size:0.68rem;margin-top:0.3rem">JPG, PNG, WEBP — stored in browser</p>`;
+  return `<div class="modal-bg" onclick="if(event.target===this){showModal=false;pendingImage=null;render()}">
+    <div class="modal">
+      <h3>${isNew?'Add Fragrance':'Edit Fragrance'}</h3>
+      <p class="modal-sub">${isNew?'Add a new fragrance to the collection':'Update fragrance details'}</p>
+      <div class="modal-grid">
+        <div class="form-group modal-full">
+          <label class="form-label">Fragrance Name</label>
+          <input class="form-input" id="m-name" value="${p.name||''}" placeholder="e.g. Rose Noir" />
+        </div>
+        <div class="form-group modal-full">
+          <label class="form-label">Product Image</label>
+          <div class="img-upload-area">
+            <input type="file" accept="image/*" onchange="handleModalImage(event)" />
+            ${imgPreview}
+          </div>
+        </div>
+        <div class="form-group modal-full">
+          <label class="form-label">Product Description</label>
+          <textarea class="form-textarea" id="m-description" placeholder="A short description shown on the product card…" style="min-height:70px">${p.description||''}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Concentration</label>
+          <select class="form-select" id="m-conc">
+            <option ${p.concentration==='Eau de Toilette'?'selected':''}>Eau de Toilette</option>
+            <option ${p.concentration==='Eau de Parfum'?'selected':''}>Eau de Parfum</option>
+            <option ${p.concentration==='Parfum'?'selected':''}>Parfum</option>
+            <option ${p.concentration==='Cologne'?'selected':''}>Cologne</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stock Quantity</label>
+          <input class="form-input" id="m-stock" type="number" min="0" value="${p.stock||0}" />
+        </div>
+        <div class="form-group modal-full">
+          <label class="form-label">Scent Notes</label>
+          <input class="form-input" id="m-notes" value="${p.notes||''}" placeholder="e.g. Rose, oud, musk" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sizes</label>
+          <input class="form-input" id="m-size" value="${p.size||''}" placeholder="50ml / 100ml" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prices (£)</label>
+          <input class="form-input" id="m-price" value="${p.price||''}" placeholder="£85 / £145" />
+        </div>
+        <div class="form-group modal-full" style="flex-direction:row;align-items:center;gap:1rem">
+          <input type="checkbox" id="m-active" ${p.active!==false?'checked':''} />
+          <label for="m-active" style="font-size:0.82rem;color:var(--muted);cursor:pointer">Show this fragrance in the collection</label>
+        </div>
+      </div>
+      <div style="display:flex;gap:1rem;margin-top:2rem">
+        ${!isNew?`<button class="btn-sm btn-danger" onclick="deletePerfume(${p.id})">Delete</button>`:''}
+        <button class="btn-sm btn-outline" style="margin-left:auto" onclick="showModal=false;pendingImage=null;render()">Cancel</button>
+        <button class="btn-sm btn-ink" onclick="saveModal(${isNew?'true':'false'},${p.id||'null'})">${isNew?'Add Fragrance':'Save Changes'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderToast(){
+  if(!toastMsg)return'';
+  return `<div class="toast show">${toastMsg}</div>`;
+}
+
+function render(){
+  const app=document.getElementById('app');
+  if(adminLoggedIn){
+    app.innerHTML=renderAdminPanel()+renderToast();
+    return;
+  }
+  app.innerHTML=renderNav()+renderHero()+renderCollection()+renderStory()+renderReserveForm()+renderFooter()+renderAdminLogin()+renderToast();
+  formspree('initForm',{formElement:'#reserve-form',formId:'maqzopvj'});
+}
+
+function navigate(v){currentView=v;render();window.scrollTo({top:0,behavior:'smooth'})}
+function scrollToCollection(){render();setTimeout(()=>document.getElementById('collection')?.scrollIntoView({behavior:'smooth'}),50)}
+function scrollToStory(){render();setTimeout(()=>document.getElementById('story')?.scrollIntoView({behavior:'smooth'}),50)}
+function scrollToReserve(){render();setTimeout(()=>document.getElementById('reserve')?.scrollIntoView({behavior:'smooth'}),50)}
+
+function openReserve(id){
+  reserveTarget=id;
+  render();
+  setTimeout(()=>document.getElementById('reserve')?.scrollIntoView({behavior:'smooth'}),60);
+}
+
+
+function attemptLogin(){
+  const pw=document.getElementById('admin-pw')?.value;
+  if(pw===ADMIN_PASSWORD){adminLoggedIn=true;showAdminLogin=false;render();}
+  else{const e=document.getElementById('admin-error');if(e)e.style.display='block';}
+}
+
+function updateStock(id,val){
+  const n=Math.max(0,parseInt(val)||0);
+  adminEdits[id]=n;
+  showSaveBar=true;
+  const row=document.querySelector(`input[onchange*="updateStock(${id}"]`) || document.querySelector(`input[oninput*="updateStock(${id}"]`);
+}
+
+function toggleActive(id,val){
+  perfumes=perfumes.map(p=>p.id===id?{...p,active:val}:p);
+  showSaveBar=true;
+  savePerfumes(perfumes);
+  render();
+}
+
+function saveChanges(){
+  Object.entries(adminEdits).forEach(([id,stock])=>{
+    perfumes=perfumes.map(p=>p.id===parseInt(id)?{...p,stock}:p);
+  });
+  adminEdits={};
+  showSaveBar=false;
+  savePerfumes(perfumes);
+  render();
+  showToast('Changes saved successfully.');
+}
+
+function discardChanges(){adminEdits={};showSaveBar=false;render();}
+
+function openAddModal(){
+  editPerfume={name:'',concentration:'Eau de Parfum',notes:'',description:'',image:'',size:'',price:'',stock:0,active:true};
+  pendingImage=null;showModal=true;render();
+}
+
+function openEditModal(id){
+  editPerfume={...perfumes.find(p=>p.id===id)};
+  pendingImage=null;showModal=true;render();
+}
+
+function handleModalImage(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{pendingImage=e.target.result;render();};
+  reader.readAsDataURL(file);
+}
+
+function removeModalImage(){
+  pendingImage='';
+  render();
+}
+
+function saveModal(isNew,id){
+  const name=document.getElementById('m-name')?.value.trim();
+  const conc=document.getElementById('m-conc')?.value;
+  const stock=parseInt(document.getElementById('m-stock')?.value)||0;
+  const notes=document.getElementById('m-notes')?.value.trim();
+  const description=document.getElementById('m-description')?.value.trim();
+  const size=document.getElementById('m-size')?.value.trim();
+  const price=document.getElementById('m-price')?.value.trim();
+  const active=document.getElementById('m-active')?.checked;
+  const image=pendingImage!==null?pendingImage:(editPerfume?.image||'');
+  if(!name){showToast('Name is required.');return;}
+  if(isNew){
+    const newId=Math.max(...perfumes.map(p=>p.id),0)+1;
+    perfumes=[...perfumes,{id:newId,name,concentration:conc,notes,description,image,size,price,stock,active}];
+  } else {
+    perfumes=perfumes.map(p=>p.id===id?{...p,name,concentration:conc,notes,description,image,size,price,stock,active}:p);
+  }
+  savePerfumes(perfumes);
+  showModal=false;editPerfume=null;pendingImage=null;
+  render();
+  showToast(isNew?'Fragrance added.':'Changes saved.');
+}
+
+function deletePerfume(id){
+  if(!confirm('Remove this fragrance from the collection?'))return;
+  perfumes=perfumes.filter(p=>p.id!==id);
+  savePerfumes(perfumes);
+  showModal=false;editPerfume=null;pendingImage=null;
+  render();
+  showToast('Fragrance removed.');
+}
+
+function exportCSV(){
+  const header='ID,Name,Concentration,Description,Notes,Size,Price,Stock,Active,Has Image';
+  const rows=perfumes.map(p=>`${p.id},"${p.name}","${p.concentration}","${(p.description||'').replace(/"/g,'""')}","${p.notes}","${p.size}","${p.price}",${p.stock},${p.active},${p.image?'Yes':'No'}`);
+  const csv=[header,...rows].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='scented-journey-stock.csv';
+  a.click();
+  showToast('CSV exported.');
+}
+
+render();
+</script>
+</body>
+</html>
