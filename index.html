@@ -395,7 +395,6 @@ function renderFooter(){
     <div class="footer-links">
       <a onclick="scrollToCollection()">Collection</a>
       <a onclick="scrollToReserve()">Reserve</a>
-      <a onclick="showAdminLogin=true;render()">Admin</a>
     </div>
   </footer>`;
 }
@@ -677,6 +676,16 @@ function exportCSV(){
   showToast('CSV exported.');
 }
 
+function checkAdminHash(){
+  if(window.location.hash==='#admin-scentedjourney'){
+    history.replaceState(null,'',window.location.pathname);
+    showAdminLogin=true;
+    render();
+  }
+}
+
+window.addEventListener('hashchange',checkAdminHash);
+checkAdminHash();
 render();
 </script>
 </body>
